@@ -1,63 +1,87 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+
+type Dot = {
+  id: string;
+  x: number;
+  y: number;
+};
+
+function generateDots(count: number): Dot[] {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `dot-${index + 1}`,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+  }));
+}
 
 export default function Home() {
+  const [dots, setDots] = useState<Dot[]>([]);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setDots(generateDots(23));
+  }, []);
+
+  const handleUndo = () => {
+    setDots((current) => current.slice(0, -1));
+  };
+
+  const handleCanvasClick = (event: MouseEvent<HTMLDivElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+    setDots((current) => [
+      ...current,
+      {
+        id: `dot-${Date.now()}-${current.length}`,
+        x: Math.max(2, Math.min(98, x)),
+        y: Math.max(2, Math.min(98, y)),
+      },
+    ]);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-[#f3f4f8] px-6 py-16 text-slate-900">
+      <main className="mx-auto flex w-full max-w-xl flex-col items-center">
+        <div className="w-full rounded-[28px] bg-white p-10 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.45)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 shadow-sm">
+              <span className="h-6 w-6 rounded-lg bg-linear-to-b from-blue-400 to-blue-600" />
+            </div>
+            <button
+              type="button"
+              onClick={handleUndo}
+              className="rounded-xl bg-linear-to-b from-blue-400 to-blue-600 px-6 py-3 text-lg font-semibold text-white shadow-[0_10px_20px_-12px_rgba(37,99,235,0.9)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_24px_-14px_rgba(37,99,235,0.9)]"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              Undo
+            </button>
+          </div>
+
+          <div
+            ref={canvasRef}
+            onClick={handleCanvasClick}
+            className="relative mt-8 aspect-4/3 w-full cursor-crosshair rounded-3xl border-2 border-dashed border-slate-200 bg-white"
+          >
+            {dots.map((dot) => (
+              <span
+                key={dot.id}
+                className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-b from-blue-400 to-blue-600"
+                style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
+              />
+            ))}
+          </div>
+
+          <p className="mt-8 text-center text-lg font-semibold text-slate-600">
+            Circles drawn: {dots.length}
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
         </div>
       </main>
     </div>
