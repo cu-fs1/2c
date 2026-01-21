@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { Button } from "@/components/ui/button";
 
 type Dot = {
   id: string;
@@ -49,22 +50,15 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f4f8] px-6 py-16 text-slate-900">
+    <div className="min-h-screen bg-slate-200 px-6 py-16 text-slate-900">
       <main className="mx-auto flex w-full max-w-xl flex-col items-center">
-        <div className="w-full rounded-[28px] bg-white p-10 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.45)]">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 shadow-sm">
-              <span className="h-6 w-6 rounded-lg bg-linear-to-b from-blue-400 to-blue-600" />
-            </div>
-            <button
-              type="button"
-              onClick={handleUndo}
-              className="rounded-xl bg-linear-to-b from-blue-400 to-blue-600 px-6 py-3 text-lg font-semibold text-white shadow-[0_10px_20px_-12px_rgba(37,99,235,0.9)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_24px_-14px_rgba(37,99,235,0.9)]"
-            >
-              Undo
-            </button>
-          </div>
-
+        <div className="w-full rounded-lg bg-white p-10">
+          <Button
+            onClick={handleUndo}
+            className="text-white bg-blue-600 cursor-pointer font-bold text-md rounded-xl"
+          >
+            Undo
+          </Button>
           <div
             ref={canvasRef}
             onClick={handleCanvasClick}
