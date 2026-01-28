@@ -70,6 +70,7 @@ export default function Home() {
     ]);
   };
 
+
   return (
     <div className="min-h-screen bg-slate-200 px-6 py-16 text-slate-900">
       <main className="mx-auto flex w-full max-w-xl flex-col items-center">
@@ -109,7 +110,10 @@ export default function Home() {
               <span
                 key={dot.id}
                 className={`absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-b ${dot.color}`}
-                style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
+                style={{
+                  top: `${dot.y}%`,
+                  left: `${dot.x}%`,
+                }}
               />
             ))}
           </div>
