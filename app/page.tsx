@@ -41,13 +41,14 @@ export default function Home() {
   const [selectedColor, setSelectedColor] = useState(COLORS[0].value);
   const canvasRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  useEffect(() => { 
     setDots(generateDots(23));
   }, []);
 
   const handleUndo = () => {
     setDots((current) => current.slice(0, -1));
   };
+
 
   const handleCanvasClick = (event: MouseEvent<HTMLDivElement>) => {
     const canvas = canvasRef.current;
@@ -68,8 +69,7 @@ export default function Home() {
         color: selectedColor,
       },
     ]);
-  };
-
+  }; 
 
   return (
     <div className="min-h-screen bg-slate-200 px-6 py-16 text-slate-900">

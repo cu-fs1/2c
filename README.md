@@ -54,18 +54,37 @@ The `Dot` type defines what each circle needs:
 
 1. Read the element’s bounding box with `getBoundingClientRect()`.
 2. Convert mouse coordinates to percent:
-	- `x = ((clientX - rect.left) / rect.width) * 100`
-	- `y = ((clientY - rect.top) / rect.height) * 100`
+   - `x = ((clientX - rect.left) / rect.width) * 100`
+   - `y = ((clientY - rect.top) / rect.height) * 100`
 3. Clamp values between 2% and 98% to keep dots inside the border.
 4. Append a new dot with a unique `id`, the computed `x`/`y`, and the current `selectedColor`.
 
-### 8) Rendering details
+### 8) State Management & The Spread Operator (`...`)
+
+The spread operator is crucial for updating state in React without "mutating" (directly changing) the original array. In `handleCanvasClick`, you see:
+
+```tsx
+setDots((current) => [
+  ...current,
+  {
+    /* new dot data */
+  },
+]);
+```
+
+#### Why we use it here:
+
+- **Immutability**: React relies on seeing a _new_ array reference to trigger a re-render. If we just did `current.push(newDot)`, the array reference remains the same, and React might not notice anything changed.
+- **Unpacking**: `...current` takes every existing dot from the current state and "unpacks" them into a brand-new array.
+- **Addition**: We then add the new dot object at the end of this new array. The result is a completely fresh array containing all the old dots plus the new one.
+
+### 9) Rendering details
 
 - The canvas is a `div` with `relative` positioning so dots can be absolutely positioned inside it.
 - Each dot is a `span` positioned with inline styles (`left`, `top`) using percentage values.
 - Tailwind classes build the UI (layout, spacing, gradients, borders, typography).
 
-### 9) The counter
+### 10) The counter
 
 The line `Circles drawn: {dots.length}` reflects the current count in state.
 
@@ -81,4 +100,3 @@ Using percentage positions makes dots responsive. If the container resizes, the 
 4. User clicks Undo → last dot removed.
 
 If you want a deeper walkthrough or changes (e.g. saving dots, dragging, or resetting), say the word and I will implement it.
-
