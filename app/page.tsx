@@ -40,8 +40,9 @@ export default function Home() {
   const [dots, setDots] = useState<Dot[]>([]);
   const [selectedColor, setSelectedColor] = useState(COLORS[0].value);
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
-  useEffect(() => { 
+  useEffect(() => {
     setDots(generateDots(23));
   }, []);
 
@@ -49,27 +50,39 @@ export default function Home() {
     setDots((current) => current.slice(0, -1));
   };
 
-
   const handleCanvasClick = (event: MouseEvent<HTMLDivElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas) {
+    const svg = svgRef.current;
+    if (!canvas || !svg) {
       return;
     }
 
     const rect = canvas.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
 
-    setDots((current) => [
-      ...current,
-      {
-        id: `dot-${Date.now()}-${current.length}`,
-        x: Math.max(2, Math.min(98, x)),
-        y: Math.max(2, Math.min(98, y)),
-        color: selectedColor,
-      },
-    ]);
-  }; 
+    // Use createSVGPoint() and matrixTransform() for coordinate transformation
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+
+    // Get the inverse of the SVG's screen CTM to transform screen coords to SVG coords
+    const ctm = svg.getScreenCTM();
+    if (ctm) {
+      const transformedPoint = point.matrixTransform(ctm.inverse());
+      // Use the transformed coordinates (normalized to percentage)
+      const x = (transformedPoint.x / rect.width) * 100;
+      const y = (transformedPoint.y / rect.height) * 100;
+
+      setDots((current) => [
+        ...current,
+        {
+          id: `dot-${Date.now()}-${current.length}`,
+          x: Math.max(2, Math.min(98, x)),
+          y: Math.max(2, Math.min(98, y)),
+          color: selectedColor,
+        },
+      ]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-200 px-6 py-16 text-slate-900">
@@ -106,6 +119,11 @@ export default function Home() {
             onClick={handleCanvasClick}
             className="relative mt-8 aspect-4/3 w-full cursor-crosshair rounded-3xl border-2 border-dashed border-slate-200 bg-white"
           >
+            {/* Hidden SVG for createSVGPoint() and matrixTransform() coordinate calculations */}
+            <svg
+              ref={svgRef}
+              className="absolute inset-0 h-full w-full pointer-events-none"
+            />
             {dots.map((dot) => (
               <span
                 key={dot.id}
