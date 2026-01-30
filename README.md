@@ -30,10 +30,6 @@ A modern, interactive "dot canvas" application built with **Next.js 16**, **Reac
 ### Installation
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd 2c
-
 # Install dependencies
 pnpm install
 
@@ -42,13 +38,6 @@ pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
-
-### Build for Production
-
-```bash
-pnpm build
-pnpm start
-```
 
 ---
 
@@ -147,19 +136,6 @@ Using percentage positions makes dots responsive. If the container resizes, the 
 
 ---
 
-## 🛠️ Tech Stack
-
-| Technology                                    | Version | Purpose                         |
-| --------------------------------------------- | ------- | ------------------------------- |
-| [Next.js](https://nextjs.org/)                | 16.1.4  | React framework with App Router |
-| [React](https://react.dev/)                   | 19.2.3  | UI library                      |
-| [TypeScript](https://www.typescriptlang.org/) | 5.x     | Type safety                     |
-| [Tailwind CSS](https://tailwindcss.com/)      | 4.x     | Utility-first CSS               |
-| [shadcn/ui](https://ui.shadcn.com/)           | -       | Button component                |
-| [Geist Font](https://vercel.com/font)         | -       | Typography                      |
-
----
-
 ## 📝 Key Implementation Details
 
 ### Client Component
@@ -194,38 +170,9 @@ y: Math.max(2, Math.min(98, y)),
 
 ---
 
-## 📄 Scripts
-
-| Script       | Description              |
-| ------------ | ------------------------ |
-| `pnpm dev`   | Start development server |
-| `pnpm build` | Build for production     |
-| `pnpm start` | Start production server  |
-| `pnpm lint`  | Run ESLint               |
-
----
-
 ## 🎨 Quick Flow Summary
 
 1. **Mount** → 23 random dots are created
 2. **Click canvas** → Position converted to percentage → New dot added with selected color
 3. **Pick color** → Future dots use that gradient
 4. **Click Undo** → Last dot removed
-
----
-
-## 📜 License
-
-This project is private.
-
----
-
-## 🤝 Contributing
-
-Feel free to extend this project with features like:
-
-- Drag and drop dots
-- Save/load canvas state
-- Reset canvas button
-- Download canvas as image
-- Custom dot sizes

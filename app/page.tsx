@@ -34,7 +34,7 @@ function generateDots(count: number): Dot[] {
     y: Math.random() * 100,
     color: "from-blue-400 to-blue-600",
   }));
-}
+} 
 
 export default function Home() {
   const [dots, setDots] = useState<Dot[]>([]);
