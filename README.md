@@ -126,7 +126,9 @@ setDots((current) => [
   { id: `dot-${Date.now()}-${current.length}`, x, y, color: selectedColor },
 ]);
 
-// Undo (slice creates new array without last element)
+// Undo (using a negative index with .slice())
+// .slice(0, -1) creates a new array containing all elements except the last one.
+// The negative index -1 refers to the last element of the array.
 setDots((current) => current.slice(0, -1));
 ```
 
@@ -154,6 +156,9 @@ function generateDots(count: number): Dot[] {
   }));
 }
 
+// The useEffect hook is used to perform side effects.
+// Here, we use it with an empty dependency array ([]) to trigger the
+// dot generation only once when the component initially mounts.
 useEffect(() => {
   setDots(generateDots(23));
 }, []);
