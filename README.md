@@ -89,31 +89,63 @@ The app provides 6 preset gradient colors:
 | Orange | `from-orange-400 to-orange-600` |
 | Pink   | `from-pink-400 to-pink-600`     |
 
-### SVG Coordinate Transformation
+### SVG Coordinate Transformation (Deep Dive)
 
-The app uses the **SVG `createSVGPoint()` and `matrixTransform()` API** for precise coordinate calculations when placing dots:
+The app uses the **SVG `createSVGPoint()` and `matrixTransform()` API** for precise coordinate mapping. This converts raw mouse clicks (screen coordinates) into coordinates relative to the canvas, even if the element is resized or transformed.
 
 ```tsx
-// Create an SVG point from mouse coordinates
+// 1. Get canvas dimensions for normalization
+const rect = canvas.getBoundingClientRect();
+
+// 2. Create an SVG point from mouse coordinates
 const point = svg.createSVGPoint();
 point.x = event.clientX;
 point.y = event.clientY;
 
-// Transform screen coordinates to SVG coordinates using the inverse CTM
+// 3. Get the Screen CTM (Current Transformation Matrix)
 const ctm = svg.getScreenCTM();
+
 if (ctm) {
+  // 4. Transform screen coordinates to SVG coordinates using the inverse matrix
   const transformedPoint = point.matrixTransform(ctm.inverse());
-  // Convert to percentage coordinates
+
+  // 5. Convert to percentage coordinates (Responsive)
   const x = (transformedPoint.x / rect.width) * 100;
   const y = (transformedPoint.y / rect.height) * 100;
+
+  // 6. Clamp values to keep dots within "safe zone"
+  const clampedX = Math.max(2, Math.min(98, x));
+  const clampedY = Math.max(2, Math.min(98, y));
 }
 ```
 
-This approach ensures accurate dot placement regardless of:
+#### Detailed Breakdown:
 
-- CSS transforms or scaling
-- Viewport changes
-- Device pixel ratios
+- **`canvas.getBoundingClientRect()`**: Returns the size and position of the canvas relative to the viewport. Used to calculate `width` and `height` for final percentage conversion.
+- **`svg.createSVGPoint()`**: Creates a utility `SVGPoint` object. SVGs have built-in math capabilities for coordinate systems that regular HTML elements lack.
+- **`event.clientX` & `event.clientY`**: The raw pixel coordinates of the mouse click relative to the browser window.
+- **`svg.getScreenCTM()`**: Returns a matrix describing how the SVG's internal coordinate system maps to the screen (accounting for CSS transforms, zoom, etc.).
+- **`ctm.inverse()`**: Reverses the matrix. Instead of mapping **Local → Screen**, it maps **Screen → Local**.
+- **`point.matrixTransform(ctm.inverse())`**: Applies the inverse matrix to the raw mouse coordinates, producing a point relative to the top-left of the SVG.
+- **Normalizing & Clamping**:
+  - **Normalization**: Converting coordinates to percentages makes the app **responsive**. Dots maintain their relative positions regardless of screen size.
+  - **Clamping**: Using `Math.max(2, Math.min(98, x))` ensures dots don't get cut off at the very edges of the container.
+
+#### 💡 What is a CTM?
+
+**CTM** stands for **Current Transformation Matrix**. It is a mathematical tool (specifically a 3x3 matrix) that acts as a **bridge** between two different coordinate systems:
+
+1.  **SVG World (Local Space):** Where shapes are defined (e.g., "x=10, y=10").
+2.  **Screen World (Viewport Space):** Where pixels actually live on your monitor.
+
+The CTM accounts for **everything** affecting the element's final position, including:
+
+- Desktop/Mobile window positioning.
+- CSS transforms like `rotate()`, `scale()`, or `translate()`.
+- Browser zoom levels.
+- Scroll offsets of parent containers.
+
+By using `ctm.inverse()`, the app "reverses" the browser's complex math, allowing us to find out exactly where a screen-click landed inside the SVG's local coordinate system.
 
 ### State Management
 

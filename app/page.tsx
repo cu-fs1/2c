@@ -27,13 +27,18 @@ const COLORS = [
   { name: "Pink", value: "from-pink-400 to-pink-600", bg: "bg-pink-500" },
 ];
 
+function createDot(id: any, x: number, y: number, color: string) {
+  return {
+    id: `${id}`,
+    x,
+    y,
+    color,
+  };
+}
 function generateDots(count: number): Dot[] {
-  return Array.from({ length: count }, (_, index) => ({
-    id: `dot-${index + 1}`,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    color: "from-blue-400 to-blue-600",
-  }));
+  return Array.from({ length: count }, (_, idx) =>
+    createDot(idx, Math.random() * 100, Math.random() * 100, COLORS[0].value),
+  );
 }
 
 export default function Home() {
@@ -47,7 +52,7 @@ export default function Home() {
   }, []);
 
   const handleUndo = () => {
-    setDots((current) => current.slice(0, -1));
+    setDots((dots) => dots.slice(0, -1));
   };
 
   const handleCanvasClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -72,15 +77,14 @@ export default function Home() {
       const x = (transformedPoint.x / rect.width) * 100;
       const y = (transformedPoint.y / rect.height) * 100;
 
-      setDots((current) => [
-        ...current,
-        {
-          id: `dot-${Date.now()}-${current.length}`,
-          x: Math.max(2, Math.min(98, x)),
-          y: Math.max(2, Math.min(98, y)),
-          color: selectedColor,
-        },
-      ]);
+      const newDot = createDot(
+        `${Date.now()}`,
+        Math.max(2, Math.min(98, x)),
+        Math.max(2, Math.min(98, y)),
+        selectedColor,
+      );
+
+      setDots((dots) => [...dots, newDot]);
     }
   };
 
